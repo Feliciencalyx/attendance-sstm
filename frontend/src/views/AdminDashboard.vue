@@ -30,9 +30,10 @@
           <button
             v-if="isAuthenticated"
             @click="logout"
-            class="px-3 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-white border border-gray-700 text-xs transition-colors"
+            class="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-white border border-gray-700 text-xs transition-colors flex items-center gap-1.5"
           >
-            Logout
+            <LogOut class="w-3.5 h-3.5" />
+            <span>Logout</span>
           </button>
 
           <!-- Enroll User Button -->
@@ -57,46 +58,47 @@
       </div>
     </header>
 
-    <!-- Admin Authentication Card (If not logged in) -->
+    <!-- Admin Authentication Login Portal (Default view when opening /admin) -->
     <div v-if="!isAuthenticated" class="max-w-md mx-auto mt-16 px-4">
       <div class="glass-panel p-8 rounded-3xl border border-gray-800/80 shadow-2xl space-y-6">
         <div class="text-center space-y-2">
-          <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
-            <Lock class="w-7 h-7" />
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/30">
+            <Lock class="w-8 h-8" />
           </div>
-          <h2 class="text-xl font-extrabold text-white">Admin Authentication</h2>
-          <p class="text-xs text-gray-400">Enter system administrator credentials to access management portal</p>
+          <h2 class="text-2xl font-extrabold text-white">Admin Portal Login</h2>
+          <p class="text-xs text-gray-400">Restricted Access. Enter system administrator credentials to proceed.</p>
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
-            <label class="block text-xs font-medium text-gray-300 mb-1">Admin Username</label>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Admin Username <span class="text-rose-400">*</span></label>
             <input
               v-model="inputUsername"
               type="text"
               required
-              placeholder="felicien"
-              class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none"
+              placeholder="e.g. felicien"
+              class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none transition-all"
             />
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-300 mb-1">Password</label>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Password <span class="text-rose-400">*</span></label>
             <input
               v-model="inputPassword"
               type="password"
               required
               placeholder="••••••••••••"
-              class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none"
+              class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none transition-all"
             />
           </div>
 
-          <div v-if="loginError" class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300">
-            {{ loginError }}
+          <div v-if="loginError" class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+            <AlertTriangle class="w-4 h-4 shrink-0 text-rose-400" />
+            <span>{{ loginError }}</span>
           </div>
 
           <!-- Credential Helper Note -->
-          <div class="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-[11px] text-indigo-300">
+          <div class="p-3.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-[11px] text-indigo-300">
             <strong>System Admin Credentials:</strong><br />
             Username: <code>felicien</code><br />
             Password: <code>Logout@800</code>
@@ -104,17 +106,17 @@
 
           <button
             type="submit"
-            class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all"
+            class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-xs shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all"
           >
             <LogIn class="w-4 h-4" />
-            <span>Authenticate Admin Portal</span>
+            <span>Sign In to Admin Portal</span>
           </button>
         </form>
       </div>
     </div>
 
-    <!-- Main Content Container (If Authenticated) -->
-    <main v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+    <!-- Main Admin Portal Content (Visible ONLY after successful authentication) -->
+    <main v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8 animate-fade-in">
       <!-- Overview Metrics Grid -->
       <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
         <!-- Total -->
@@ -199,7 +201,9 @@ import {
   UserPlus, 
   ScanFace, 
   Lock, 
-  LogIn 
+  LogIn, 
+  LogOut, 
+  AlertTriangle 
 } from 'lucide-vue-next'
 import { useAttendanceStore } from '../stores/attendance'
 import AttendanceOverride from '../components/AttendanceOverride.vue'
@@ -208,11 +212,11 @@ import UserEnrollmentModal from '../components/UserEnrollmentModal.vue'
 
 const attendanceStore = useAttendanceStore()
 const isEnrollModalOpen = ref(false)
-const isAuthenticated = ref(true) // Session state
-const adminUsername = ref('felicien')
+const isAuthenticated = ref(false) // Requires explicit login by default
+const adminUsername = ref('')
 
-const inputUsername = ref('felicien')
-const inputPassword = ref('Logout@800')
+const inputUsername = ref('')
+const inputPassword = ref('')
 const loginError = ref('')
 
 const handleLogin = () => {
@@ -234,6 +238,8 @@ const handleLogin = () => {
 
 const logout = () => {
   isAuthenticated.value = false
+  inputUsername.value = ''
+  inputPassword.value = ''
 }
 
 const handleUserEnrolled = () => {
