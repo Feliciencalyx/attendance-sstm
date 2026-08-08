@@ -58,7 +58,7 @@
       </div>
     </header>
 
-    <!-- Admin Authentication Login Portal (Default view when opening /admin) -->
+    <!-- Admin Authentication Login Portal (Clean Secure View) -->
     <div v-if="!isAuthenticated" class="max-w-md mx-auto mt-16 px-4">
       <div class="glass-panel p-8 rounded-3xl border border-gray-800/80 shadow-2xl space-y-6">
         <div class="text-center space-y-2">
@@ -66,7 +66,7 @@
             <Lock class="w-8 h-8" />
           </div>
           <h2 class="text-2xl font-extrabold text-white">Admin Portal Login</h2>
-          <p class="text-xs text-gray-400">Restricted Access. Enter system administrator credentials to proceed.</p>
+          <p class="text-xs text-gray-400">Restricted Access. Enter administrator credentials to proceed.</p>
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-4">
@@ -76,7 +76,7 @@
               v-model="inputUsername"
               type="text"
               required
-              placeholder="e.g. felicien"
+              placeholder="Enter your admin username"
               class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none transition-all"
             />
           </div>
@@ -87,7 +87,7 @@
               v-model="inputPassword"
               type="password"
               required
-              placeholder="••••••••••••"
+              placeholder="Enter your password"
               class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none transition-all"
             />
           </div>
@@ -95,13 +95,6 @@
           <div v-if="loginError" class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
             <AlertTriangle class="w-4 h-4 shrink-0 text-rose-400" />
             <span>{{ loginError }}</span>
-          </div>
-
-          <!-- Credential Helper Note -->
-          <div class="p-3.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-[11px] text-indigo-300">
-            <strong>System Admin Credentials:</strong><br />
-            Username: <code>felicien</code><br />
-            Password: <code>Logout@800</code>
           </div>
 
           <button
@@ -191,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { 
   ShieldCheck, 
   Clock, 
@@ -212,7 +205,7 @@ import UserEnrollmentModal from '../components/UserEnrollmentModal.vue'
 
 const attendanceStore = useAttendanceStore()
 const isEnrollModalOpen = ref(false)
-const isAuthenticated = ref(false) // Requires explicit login by default
+const isAuthenticated = ref(false) // Mandatory auth check
 const adminUsername = ref('')
 
 const inputUsername = ref('')
@@ -224,15 +217,15 @@ const handleLogin = () => {
   const p = inputPassword.value
 
   if (
-    (u === 'felicien' || u === 'felicien@biocheckpro.com' || u === 'admin') &&
-    (p === 'Logout@800' || p === 'Logout@800!' || p === 'AdminPass123!')
+    (u === 'felicien' || u === 'felicien@biocheckpro.com') &&
+    (p === 'Logout@800' || p === 'Logout@800!')
   ) {
     isAuthenticated.value = true
     adminUsername.value = inputUsername.value
     loginError.value = ''
     attendanceStore.fetchAttendance()
   } else {
-    loginError.value = 'Invalid admin credentials. Username: felicien | Password: Logout@800'
+    loginError.value = 'Invalid admin credentials.'
   }
 }
 
@@ -240,6 +233,7 @@ const logout = () => {
   isAuthenticated.value = false
   inputUsername.value = ''
   inputPassword.value = ''
+  adminUsername.value = ''
 }
 
 const handleUserEnrolled = () => {
