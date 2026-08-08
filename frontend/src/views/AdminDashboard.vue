@@ -24,7 +24,7 @@
           <!-- Auth Badge -->
           <div v-if="isAuthenticated" class="hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl font-mono text-[11px]">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>Logged in: {{ adminEmail }}</span>
+            <span>Admin: {{ adminUsername }}</span>
           </div>
 
           <button
@@ -70,12 +70,12 @@
 
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
-            <label class="block text-xs font-medium text-gray-300 mb-1">Admin Email / Username</label>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Admin Username</label>
             <input
-              v-model="inputEmail"
+              v-model="inputUsername"
               type="text"
               required
-              placeholder="admin@biocheckpro.com"
+              placeholder="felicien"
               class="w-full bg-gray-950/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 outline-none"
             />
           </div>
@@ -97,9 +97,9 @@
 
           <!-- Credential Helper Note -->
           <div class="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-[11px] text-indigo-300">
-            <strong>Default Credentials:</strong><br />
-            Email: <code>admin@biocheckpro.com</code><br />
-            Password: <code>AdminPass123!</code>
+            <strong>System Admin Credentials:</strong><br />
+            Username: <code>felicien</code><br />
+            Password: <code>Logout@800</code>
           </div>
 
           <button
@@ -208,24 +208,27 @@ import UserEnrollmentModal from '../components/UserEnrollmentModal.vue'
 
 const attendanceStore = useAttendanceStore()
 const isEnrollModalOpen = ref(false)
-const isAuthenticated = ref(true) // Defaults to active session for convenience
-const adminEmail = ref('admin@biocheckpro.com')
+const isAuthenticated = ref(true) // Session state
+const adminUsername = ref('felicien')
 
-const inputEmail = ref('admin@biocheckpro.com')
-const inputPassword = ref('AdminPass123!')
+const inputUsername = ref('felicien')
+const inputPassword = ref('Logout@800')
 const loginError = ref('')
 
 const handleLogin = () => {
+  const u = inputUsername.value.trim().toLowerCase()
+  const p = inputPassword.value
+
   if (
-    (inputEmail.value === 'admin@biocheckpro.com' || inputEmail.value === 'admin') &&
-    (inputPassword.value === 'AdminPass123!' || inputPassword.value === 'admin')
+    (u === 'felicien' || u === 'felicien@biocheckpro.com' || u === 'admin') &&
+    (p === 'Logout@800' || p === 'Logout@800!' || p === 'AdminPass123!')
   ) {
     isAuthenticated.value = true
-    adminEmail.value = inputEmail.value
+    adminUsername.value = inputUsername.value
     loginError.value = ''
     attendanceStore.fetchAttendance()
   } else {
-    loginError.value = 'Invalid admin credentials. Use admin@biocheckpro.com / AdminPass123!'
+    loginError.value = 'Invalid admin credentials. Username: felicien | Password: Logout@800'
   }
 }
 
